@@ -25,6 +25,7 @@
   "require": {
     "php": ">=8.1",
     "htmlburger/carbon-fields": "^3.6",
+    "wp-graphql/wp-graphql": "^2.0.0",
     "roots/acorn": "^4.1"
   },
   "require-dev": {
