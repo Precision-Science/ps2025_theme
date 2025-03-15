@@ -9,3 +9,11 @@
     </nav>
   @endif
 </header>
+<div>
+  <h2>Site options</h2>
+
+  {!!
+    'GTM ID: '.carbon_get_theme_option( 'crb_gtm_id' );
+  !!}
+</div>
+<hr/>
