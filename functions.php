@@ -58,3 +58,81 @@ collect(['setup', 'filters'])
             );
         }
     });
+
+    
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Post types
+    |--------------------------------------------------------------------------
+    |
+    | Custom post types so we can differentiate content
+    |
+    */
+        
+    add_action( 'init', 'register_team' );
+    function register_team() {
+        register_post_type( 'team',
+            array(
+                'labels' => array(
+                    'name' => __( 'Team' ),
+                    'singular_name' => __( 'Person' )
+                ),
+                'hierarchical' => true,
+                'show_in_nav_menus' => false,
+                'publicly_queryable' => false,
+                //'rewrite' => array( 'slug' => 'team' ),
+                'public' => true,
+                'has_archive' => false,
+                'supports' => array( 'title','thumbnail','editor','page-attributes' ),
+            )
+        );
+    }
+        
+    /*
+    |--------------------------------------------------------------------------
+    | Custom Fields
+    |--------------------------------------------------------------------------
+    |
+    | Custom fields for the theme
+    |
+    */
+    
+    use Carbon_Fields\Container;
+    use Carbon_Fields\Field;
+    
+    #add_filter( 'carbon_fields_theme_options_container_admin_only_access', '__return_false' );
+
+    
+    add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\crb_attach_theme_options' );    
+    function crb_attach_theme_options(){
+        $basic_options_container = Container::make( 'theme_options', __( 'Sites Options' ) )
+        ->add_fields( array(
+            Field::make( 'text', 'crb_gtm_id', __( 'Google Tag Manager ID' ) ),
+            Field::make( 'text', 'crb_google_site_verification', __( 'Google Site Verification ID' ) ),
+            Field::make( 'text', 'crb_recaptcha_client_key', __( 'Google Recaptcha - Client Key' ) ),
+            Field::make( 'text', 'crb_recaptcha_secret_key', __( 'Google Recaptcha - Secret Key' ) )
+        ) );
+
+        Container::make( 'theme_options', __( 'Site Options' ) )
+        ->set_page_parent( $basic_options_container ) 
+        ->set_page_menu_title( 'API settings' )
+        ->add_fields( array(
+    
+        ) );
+    }
+
+    add_action( 'carbon_fields_register_fields', __NAMESPACE__ . '\\crb_attach_custom_fields' );
+    function crb_attach_custom_fields() {
+        Container::make( 'post_meta', 'Custom Data' )
+        ->where( 'post_type', '=', 'page' )
+        ->add_fields( array(
+            Field::make( 'color', 'crb_page_theme', 'Page Theme Color' )
+                ->set_palette( array( '#FF0000', '#00FF00', '#0000FF' ) )
+        ));
+    }    
+
+    add_action( 'after_setup_theme', 'crb_load' );
+    function crb_load() {
+        require_once( 'vendor/autoload.php' );
+        \Carbon_Fields\Carbon_Fields::boot();
+    }
